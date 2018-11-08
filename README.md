@@ -11,3 +11,6 @@ heart-rate threshold as been reached.
 This version of AnEAR is closely related to ED-EAR, but is not in clinical use. Rather than collecting data from a Microsoft Band, AnearAW collects data from any
 Android Wear (now Google Wear) smartwatch. The layout of the application is nearly identical to ED-EAR, so it is also password protected and offers the same types of
 settings.
+
+# StepCountAW
+Largely unrelated to the other two applications, StepCountAW collects the step count data from an Android Wear (now Google Wear) smartwatch and stores that data locally on the smartphone. This application has been used for in-house studies in the WBL.
