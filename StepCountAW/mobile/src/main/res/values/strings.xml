@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">StepCountAW</string>
-    <string name="toggleBtn_start">Start</string>
-    <string name="toggleBtn_stop">Stop</string>
-    <string name="menu_filename">Name File</string>
-</resources>

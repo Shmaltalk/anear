@@ -6,11 +6,4 @@ The ED-EAR application is currently being used by Bradley Hospital and Rhode Isl
 all available sensors that the Microsoft 2 smartwatch offers, and saves them to individual CSV files. These files are stored in a directory locally on the phone
 that corresponds with the patient's ID number. Additionally, the phone that hosts this application records the surrounding audio periodically, and whenever a certain
 heart-rate threshold as been reached. 
-
-# AnearAW
-This version of AnEAR is closely related to ED-EAR, but is not in clinical use. Rather than collecting data from a Microsoft Band, AnearAW collects data from any
-Android Wear (now Google Wear) smartwatch. The layout of the application is nearly identical to ED-EAR, so it is also password protected and offers the same types of
-settings.
-
-# StepCountAW
-Largely unrelated to the other two applications, StepCountAW collects the step count data from an Android Wear (now Google Wear) smartwatch and stores that data locally on the smartphone. This application has been used for in-house studies in the WBL.
+Now being updated for use with Fitbit smart watches rather than Microsoft smart watches, due to discontinuation of Microsoft Band services.
