@@ -2,7 +2,7 @@ package wbl.egr.uri.sensorcollector.band_listeners;
 
 import android.content.Context;
 
-import com.microsoft.band.sensors.BandHeartRateEvent;
+imporcct com.microsoft.band.sensors.BandHeartRateEvent;
 import com.microsoft.band.sensors.BandHeartRateEventListener;
 import com.microsoft.band.sensors.HeartRateQuality;
 

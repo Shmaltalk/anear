@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: me.zhanghai.android.patternlock:library:2.0.3@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-2.0.3.aar/fa693dac4fccffc118cd9dc5a0cc93ba/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-2.0.3.aar/fa693dac4fccffc118cd9dc5a0cc93ba/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.zhanghai.android.patternlock/library/2.0.3/830a949e73089b279ddf8a5998f19a9f8d7029e5/library-2.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
