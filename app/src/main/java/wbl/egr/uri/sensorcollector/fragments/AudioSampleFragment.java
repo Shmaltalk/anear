@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-
 import wbl.egr.uri.sensorcollector.R;
 import wbl.egr.uri.sensorcollector.activities.AudioSampleActivity;
 import wbl.egr.uri.sensorcollector.services.AudioRecordManager;

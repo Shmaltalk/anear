@@ -8,6 +8,8 @@ import android.media.MediaRecorder;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
+import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
+import wbl.egr.uri.sensorcollector.models.AudioRecordModel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-
-import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
-import wbl.egr.uri.sensorcollector.models.AudioRecordModel;
 
 /**
  * Created by Matt Constant on 2/23/17.

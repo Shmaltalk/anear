@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
 import wbl.egr.uri.sensorcollector.R;
 import wbl.egr.uri.sensorcollector.fragments.AudioSampleFragment;
 

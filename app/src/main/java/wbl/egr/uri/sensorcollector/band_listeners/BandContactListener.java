@@ -2,21 +2,19 @@ package wbl.egr.uri.sensorcollector.band_listeners;
 
 import android.content.Context;
 import android.content.Intent;
-
 import com.microsoft.band.sensors.BandContactEvent;
 import com.microsoft.band.sensors.BandContactEventListener;
 import com.microsoft.band.sensors.BandContactState;
+import wbl.egr.uri.sensorcollector.activities.MainActivity;
+import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
+import wbl.egr.uri.sensorcollector.receivers.BandContactStateReceiver;
+import wbl.egr.uri.sensorcollector.services.DataLogService;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
-import wbl.egr.uri.sensorcollector.activities.MainActivity;
-import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
-import wbl.egr.uri.sensorcollector.receivers.BandContactStateReceiver;
-import wbl.egr.uri.sensorcollector.services.DataLogService;
 
 /**
  * Created by mconstant on 2/22/17.

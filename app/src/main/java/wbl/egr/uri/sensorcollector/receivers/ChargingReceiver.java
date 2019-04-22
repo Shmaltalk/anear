@@ -4,14 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import wbl.egr.uri.sensorcollector.activities.MainActivity;
+import wbl.egr.uri.sensorcollector.services.DataLogService;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-
-import wbl.egr.uri.sensorcollector.activities.MainActivity;
-import wbl.egr.uri.sensorcollector.services.DataLogService;
 
 /**
  * Created by mconstant on 2/23/17.

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "wbl.egr.uri.sensorcollector"
         minSdkVersion 16
@@ -31,4 +31,5 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:core:0.9.3.0'
     implementation 'com.android.support:design:25.3.0'
     implementation 'com.android.support:appcompat-v7:25.3.0'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
 }

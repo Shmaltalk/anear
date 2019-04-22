@@ -9,16 +9,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
+import wbl.egr.uri.sensorcollector.activities.MainActivity;
+import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
+import wbl.egr.uri.sensorcollector.receivers.AlarmReceiver;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
-import wbl.egr.uri.sensorcollector.activities.MainActivity;
-import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
-import wbl.egr.uri.sensorcollector.receivers.AlarmReceiver;
 
 /**
  * Created by mconstant on 2/23/17.

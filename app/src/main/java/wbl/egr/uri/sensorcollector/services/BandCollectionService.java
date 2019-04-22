@@ -11,34 +11,23 @@ import android.os.PowerManager;
 import android.os.Vibrator;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.microsoft.band.BandClient;
-import com.microsoft.band.BandClientManager;
-import com.microsoft.band.BandConnectionCallback;
-import com.microsoft.band.BandException;
-import com.microsoft.band.BandIOException;
-import com.microsoft.band.BandInfo;
-import com.microsoft.band.BandResultCallback;
-import com.microsoft.band.ConnectionState;
-import com.microsoft.band.InvalidBandVersionException;
+import com.microsoft.band.*;
 import com.microsoft.band.notifications.VibrationType;
 import com.microsoft.band.sensors.BandSensorManager;
 import com.microsoft.band.sensors.GsrSampleRate;
 import com.microsoft.band.sensors.SampleRate;
-
-import java.util.concurrent.TimeUnit;
-
 import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
-import wbl.egr.uri.sensorcollector.band_listeners.BandAccelerometerListener;
-import wbl.egr.uri.sensorcollector.band_listeners.BandAmbientLightListener;
-import wbl.egr.uri.sensorcollector.band_listeners.BandContactListener;
-import wbl.egr.uri.sensorcollector.band_listeners.BandGsrListener;
-import wbl.egr.uri.sensorcollector.band_listeners.BandHeartRateListener;
-import wbl.egr.uri.sensorcollector.band_listeners.BandRRIntervalListener;
-import wbl.egr.uri.sensorcollector.band_listeners.BandSkinTemperatureListener;
+import wbl.egr.uri.sensorcollector.band_listeners.*;
+import wbl.egr.uri.sensorcollector.fitbit.FBClient;
+import wbl.egr.uri.sensorcollector.fitbit.FBClientManager;
+import wbl.egr.uri.sensorcollector.fitbit.FBInfo;
+import wbl.egr.uri.sensorcollector.fitbit.FBSensorManager;
 import wbl.egr.uri.sensorcollector.receivers.BandContactStateReceiver;
 import wbl.egr.uri.sensorcollector.receivers.BandUpdateReceiver;
 import wbl.egr.uri.sensorcollector.receivers.TestBandReceiver;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Matt Constant on 2/22/17.
@@ -197,8 +186,8 @@ public class BandCollectionService extends Service {
 
     private final int NOTIFICATION_ID = 43;
 
-    private BandClientManager mBandClientManager;
-    private BandClient mBandClient;
+    private FBClientManager mBandClientManager;
+    private FBClient mBandClient;
     private BandAccelerometerListener mBandAccelerometerListener;
     private BandAmbientLightListener mBandAmbientLightListener;
     private BandContactListener mBandContactListener;
@@ -250,8 +239,8 @@ public class BandCollectionService extends Service {
                     mState = STATE_CONNECTED;
                     updateNotification("CONNECTED", android.R.drawable.presence_away);
                     try {
-                        mBandClient.getNotificationManager().vibrate(VibrationType.RAMP_UP);
-                    } catch (BandException e) {
+                        mBandClient.getNotificationManager().vibrate(); //VibrationType.RAMP_UP);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
@@ -262,7 +251,7 @@ public class BandCollectionService extends Service {
                         startStreaming();
                     }
 
-                    mBandClient.registerConnectionCallback(mBandConnectionCallback);
+                    //mBandClient.registerConnectionCallback(mBandConnectionCallback);
 
                     mState = STATE_CONNECTED;
 
@@ -333,11 +322,11 @@ public class BandCollectionService extends Service {
                         startStreaming();
                     }
 
-                    try {
-                        mBandClient.getNotificationManager().vibrate(VibrationType.TWO_TONE_HIGH);
-                    } catch (BandIOException e) {
-                        e.printStackTrace();
-                    }
+                    //try {
+                        mBandClient.getNotificationManager().vibrate(); //VibrationType.TWO_TONE_HIGH);
+                    //} catch (BandIOException e) {
+                    //    e.printStackTrace();
+                    //}
 
                     mState = STATE_CONNECTED;
 
@@ -409,7 +398,7 @@ public class BandCollectionService extends Service {
         startForeground(NOTIFICATION_ID, notification);
 
         //  Receives the sensor information of the sensors we will aggregate data from
-        mBandClientManager = BandClientManager.getInstance();
+        mBandClientManager = FBClientManager.getInstance();
         mBandAccelerometerListener = new BandAccelerometerListener(this);
         mBandAmbientLightListener = new BandAmbientLightListener(this);
         mBandContactListener = new BandContactListener(this);
@@ -505,28 +494,28 @@ public class BandCollectionService extends Service {
             return;
         }
 
-        BandInfo[] pairedBands = mBandClientManager.getPairedBands();
-        if (pairedBands == null || pairedBands.length == 0) {
+        List<FBInfo> pairedBands = mBandClientManager.getConnectedBands();
+        if (pairedBands == null || pairedBands.size() == 0) {
             log("Connect Failed (No Bands are Paired with this Device)");
-        } else if (pairedBands.length > 1) {
+        } else if (pairedBands.size() > 1) {
             /*
              * TODO
              * Implement UI to allow User to choose Band to pair to.
              * For now, always choose pairedBands[0]
              */
-            connect(pairedBands[0]);
+            connect(pairedBands.get(0));
         } else {
-            connect(pairedBands[0]);
+            connect(pairedBands.get(0));
         }
     }
 
     // Uses the information just gathered in order to connect to the band
-    private void connect(BandInfo bandInfo) {
+    private void connect(FBInfo bandInfo) {
         log("Attempting to Connect to " + bandInfo.getMacAddress() + "...");
         mBandName = bandInfo.getName();
         mBandAddress = bandInfo.getMacAddress();
         mBandClient = mBandClientManager.create(this, bandInfo);
-        mBandClient.connect().registerResultCallback(mBandConnectResultCallback);
+        mBandClient.connect();//.registerResultCallback(mBandConnectResultCallback);
     }
 
     //  Sends the information to the Settings for the user to see
@@ -564,22 +553,23 @@ public class BandCollectionService extends Service {
             try {Thread.sleep(250);}
             catch (InterruptedException e) {e.printStackTrace();}
 
-            log(mBandClient.getSensorManager().getCurrentHeartRateConsent().name());
-            BandSensorManager bandSensorManager = mBandClient.getSensorManager();
+            //log(mBandClient.getSensorManager().getCurrentHeartRateConsent().name());
+            FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try
             {
-                log(bandSensorManager.getCurrentHeartRateConsent().name());
+                //log(bandSensorManager.getCurrentHeartRateConsent().name());
                 mState = STATE_STREAMING;
                 updateNotification("STREAMING", android.R.drawable.presence_online);
-                bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener, SampleRate.MS128);
-                bandSensorManager.registerAmbientLightEventListener(mBandAmbientLightListener);
-                bandSensorManager.registerContactEventListener(mBandContactListener);
-                bandSensorManager.registerGsrEventListener(mBandGsrListener, GsrSampleRate.MS200);
+                // XXX Listeners NYI
+                bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener);//, SampleRate.MS128);
+//                bandSensorManager.registerAmbientLightEventListener(mBandAmbientLightListener);
+//                bandSensorManager.registerContactEventListener(mBandContactListener);
+//                bandSensorManager.registerGsrEventListener(mBandGsrListener, GsrSampleRate.MS200);
                 bandSensorManager.registerHeartRateEventListener(mBandHeartRateListener);
-                bandSensorManager.registerRRIntervalEventListener(mBandRRIntervalListener);
-                bandSensorManager.registerSkinTemperatureEventListener(mBandSkinTemperatureListener);
+//                bandSensorManager.registerRRIntervalEventListener(mBandRRIntervalListener);
+//                bandSensorManager.registerSkinTemperatureEventListener(mBandSkinTemperatureListener);
             }
-            catch (BandException | InvalidBandVersionException e) {
+            catch (Exception e) {
                 e.printStackTrace();
             }
             startTimer = new CountDownTimer(180000,180000)
@@ -609,18 +599,19 @@ public class BandCollectionService extends Service {
             try {Thread.sleep(250);}
             catch (InterruptedException e) {e.printStackTrace();}
 
-            BandSensorManager bandSensorManager = mBandClient.getSensorManager();
+            FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try {
-                bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
+                bandSensorManager.stop();
+                //bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
 //                bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
 //                bandSensorManager.unregisterContactEventListener(mBandContactListener);
-                bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
-                bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
-                bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
-                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
+//                bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
+//                bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
+//                bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
+//                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
                 mState = STATE_CONNECTED;
                 updateNotification("POWER-SAVING", android.R.drawable.presence_away);
-            } catch (BandIOException | IllegalArgumentException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             stopTimer = new CountDownTimer(180000,180000)
@@ -654,18 +645,19 @@ public class BandCollectionService extends Service {
                 e.printStackTrace();
             }
 
-            BandSensorManager bandSensorManager = mBandClient.getSensorManager();
+            FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try {
-                bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
-                bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
-                bandSensorManager.unregisterContactEventListener(mBandContactListener);
-                bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
-                bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
-                bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
-                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
+                bandSensorManager.stop();
+//                bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
+//                bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
+//                bandSensorManager.unregisterContactEventListener(mBandContactListener);
+//                bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
+//                bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
+//                bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
+//                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
                 mState = STATE_CONNECTED;
                 updateNotification("POWER-SAVING", android.R.drawable.presence_away);
-            } catch (BandIOException | IllegalArgumentException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -686,16 +678,17 @@ public class BandCollectionService extends Service {
         if (mBandClient.isConnected()) {
             updateNotification("Band is not being worn", android.R.drawable.presence_away);
         }
-        BandSensorManager bandSensorManager = mBandClient.getSensorManager();
+        FBSensorManager bandSensorManager = mBandClient.getSensorManager();
         try {
-            bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
-            bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
-            bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
-            bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
-            bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
-            bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
+            bandSensorManager.stop();
+//            bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
+//            bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
+//            bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
+//            bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
+//            bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
+//            bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
             mState = STATE_NOT_WORN;
-        } catch (BandIOException | IllegalArgumentException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -705,16 +698,17 @@ public class BandCollectionService extends Service {
         if (mBandClient.isConnected()) {
             updateNotification("STREAMING", android.R.drawable.presence_online);
         }
-        BandSensorManager bandSensorManager = mBandClient.getSensorManager();
+        FBSensorManager bandSensorManager = mBandClient.getSensorManager();
         try {
-            bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener, SampleRate.MS128);
-            bandSensorManager.registerAmbientLightEventListener(mBandAmbientLightListener);
-            bandSensorManager.registerGsrEventListener(mBandGsrListener, GsrSampleRate.MS200);
-            bandSensorManager.registerHeartRateEventListener(mBandHeartRateListener);
-            bandSensorManager.registerRRIntervalEventListener(mBandRRIntervalListener);
-            bandSensorManager.registerSkinTemperatureEventListener(mBandSkinTemperatureListener);
+            bandSensorManager.start();
+//            bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener, SampleRate.MS128);
+//            bandSensorManager.registerAmbientLightEventListener(mBandAmbientLightListener);
+//            bandSensorManager.registerGsrEventListener(mBandGsrListener, GsrSampleRate.MS200);
+//            bandSensorManager.registerHeartRateEventListener(mBandHeartRateListener);
+//            bandSensorManager.registerRRIntervalEventListener(mBandRRIntervalListener);
+//            bandSensorManager.registerSkinTemperatureEventListener(mBandSkinTemperatureListener);
             mState = STATE_STREAMING;
-        } catch (BandException | InvalidBandVersionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -734,8 +728,8 @@ public class BandCollectionService extends Service {
         }
 
         try {
-            mBandClient.getNotificationManager().vibrate(VibrationType.RAMP_DOWN);
-        } catch (BandException e) {
+            mBandClient.getNotificationManager().vibrate(); //VibrationType.RAMP_DOWN);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -744,7 +738,7 @@ public class BandCollectionService extends Service {
             fullStopStreaming();
         }
 
-        mBandClient.disconnect().registerResultCallback(mBandDisconnectResultCallback, 10, TimeUnit.SECONDS);
+        mBandClient.disconnect();//.registerResultCallback(mBandDisconnectResultCallback, 10, TimeUnit.SECONDS);
     }
 
     //  Updates the streaming status icon on the top of the phone

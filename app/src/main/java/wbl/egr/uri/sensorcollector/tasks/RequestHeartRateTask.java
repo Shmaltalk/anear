@@ -4,15 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandClientManager;
 import com.microsoft.band.BandInfo;
 import com.microsoft.band.sensors.HeartRateConsentListener;
+import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
 
 import java.lang.ref.WeakReference;
-
-import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
 
 /**
  * Created by mconstant on 2/23/17.

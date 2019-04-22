@@ -1,11 +1,10 @@
 package wbl.egr.uri.sensorcollector.activities;
 
 import android.content.Intent;
-
-import java.util.List;
-
 import me.zhanghai.android.patternlock.PatternUtils;
 import me.zhanghai.android.patternlock.PatternView;
+
+import java.util.List;
 
 /**
  * Created by mconstant on 2/24/17.

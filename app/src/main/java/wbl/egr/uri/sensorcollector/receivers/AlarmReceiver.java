@@ -3,7 +3,6 @@ package wbl.egr.uri.sensorcollector.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
 import wbl.egr.uri.sensorcollector.services.AudioRecordManager;
 
 /**

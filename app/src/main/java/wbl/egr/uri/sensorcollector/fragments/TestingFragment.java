@@ -11,23 +11,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import wbl.egr.uri.sensorcollector.R;
+import wbl.egr.uri.sensorcollector.activities.MainActivity;
+import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
+import wbl.egr.uri.sensorcollector.receivers.TestBandReceiver;
+import wbl.egr.uri.sensorcollector.services.AudioRecordManager;
+import wbl.egr.uri.sensorcollector.services.BandCollectionService;
+import wbl.egr.uri.sensorcollector.services.DataLogService;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-
-import wbl.egr.uri.sensorcollector.activities.MainActivity;
-import wbl.egr.uri.sensorcollector.R;
-import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
-import wbl.egr.uri.sensorcollector.receivers.TestBandReceiver;
-import wbl.egr.uri.sensorcollector.services.AudioRecordManager;
-import wbl.egr.uri.sensorcollector.services.BandCollectionService;
-import wbl.egr.uri.sensorcollector.services.DataLogService;
 
 /**
  * Created by mconstant on 2/23/17.

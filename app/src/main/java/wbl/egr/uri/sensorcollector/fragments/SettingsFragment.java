@@ -9,13 +9,8 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
-
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-
-import java.lang.ref.WeakReference;
-import java.util.Map;
-
 import wbl.egr.uri.sensorcollector.R;
 import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
 import wbl.egr.uri.sensorcollector.receivers.BandUpdateReceiver;
@@ -23,14 +18,10 @@ import wbl.egr.uri.sensorcollector.services.AudioRecordManager;
 import wbl.egr.uri.sensorcollector.services.BandCollectionService;
 import wbl.egr.uri.sensorcollector.tasks.RequestHeartRateTask;
 
-import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.KEY_AUDIO_DELAY;
-import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.KEY_AUDIO_DURATION;
-import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.KEY_AUDIO_ENABLE;
-import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.KEY_BLACKOUT_TOGGLE;
-import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.KEY_HR_TRIGGER;
-import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.KEY_IDENTIFIER;
-import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.KEY_PATTERN;
-import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.KEY_SENSOR_ENABLE;
+import java.lang.ref.WeakReference;
+import java.util.Map;
+
+import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.*;
 
 /**
  * Created by Matt Constant on 2/23/17.

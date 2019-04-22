@@ -12,12 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
-import java.lang.ref.WeakReference;
-
 import wbl.egr.uri.sensorcollector.R;
 import wbl.egr.uri.sensorcollector.fragments.SettingsFragment;
 import wbl.egr.uri.sensorcollector.tasks.RequestHeartRateTask;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Created by mconstant on 2/23/17.
