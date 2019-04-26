@@ -1,7 +1,23 @@
 package wbl.egr.uri.sensorcollector.collector_server;
 
-import fi.iki.elonen.NanoHTTPD;
+import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.microsoft.band.BandClient;
+import com.microsoft.band.BandClientManager;
+import com.microsoft.band.BandInfo;
+
+import fi.iki.elonen.NanoHTTPD;
+import wbl.egr.uri.sensorcollector.fitbit.FBClient;
+import wbl.egr.uri.sensorcollector.fitbit.FBClientManager;
+import wbl.egr.uri.sensorcollector.fitbit.FBInfo;
+import wbl.egr.uri.sensorcollector.fitbit.events.FBHeartRateEvent;
+import wbl.egr.uri.sensorcollector.fitbit.listeners.FBHeartRateEventListener;
+import wbl.egr.uri.sensorcollector.services.BandCollectionService;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,50 +25,43 @@ import java.util.Map;
 import static java.util.Objects.toString;
 
 public class CollectorServer extends NanoHTTPD {
-
-  public CollectorServer() {
+  private static final Gson GSON = new Gson();
+  private FBClient cli;
+  public CollectorServer(FBClient c) {
     super(9673);
+    Log.d("collector", "Collector server started!");
+    cli = c;
   }
 
   @Override
-  public Response serve(IHTTPSession session) {
+  public void start() throws IOException {
+      Log.d("collector", "Called .start!");
+      super.start();
+  }
 
-    Map<String, List<String>> decodedQueryParameters =
-            decodeParameters(session.getQueryParameterString());
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("<html>");
-    sb.append("<head><title>Debug Server</title></head>");
-    sb.append("<body>");
-    sb.append("<h1>Debug Server</h1>");
-
-    sb.append("<p><blockquote><b>URI</b> = ").append(
-            String.valueOf(session.getUri())).append("<br />");
-
-    sb.append("<b>Method</b> = ").append(
-            String.valueOf(session.getMethod())).append("</blockquote></p>");
-
-    sb.append("<h3>Headers</h3><p><blockquote>").
-            append(toString(session.getHeaders())).append("</blockquote></p>");
-
-    sb.append("<h3>Parms</h3><p><blockquote>").
-            append(toString(session.getParms())).append("</blockquote></p>");
-
-    sb.append("<h3>Parms (multi values?)</h3><p><blockquote>").
-            append(toString(decodedQueryParameters)).append("</blockquote></p>");
-
-    try {
-      Map<String, String> files = new HashMap<String, String>();
-      session.parseBody(files);
-      sb.append("<h3>Files</h3><p><blockquote>").
-              append(toString(files)).append("</blockquote></p>");
-    } catch (Exception e) {
-      e.printStackTrace();
+    @Override
+    public void stop() {
+        Log.d("collector", "Called .stop!");
+        super.stop();
     }
 
-    sb.append("</body>");
-    sb.append("</html>");
-    return newFixedLengthResponse(sb.toString());
+  @Override
+  public Response serve(IHTTPSession session) {
+    Log.d("collector", "Got request!");
+    Map<String, List<String>> decodedQueryParameters =
+            decodeParameters(session.getQueryParameterString());
+    String uri = session.getUri();
+    if(uri.equals("/heartrate")) {
+        JsonParser parser = new JsonParser();
+        JsonObject json = (JsonObject) parser.parse(session.getParms().get("rate"));
+        double hr = json.getAsJsonPrimitive().getAsDouble();
+        System.out.println("Got heart rate: " + hr);
+        FBHeartRateEventListener hrlist = cli.getSensorManager().getHeartRateEventListener();
+        if(hrlist != null) {
+            hrlist.onBandHeartRateChanged(new FBHeartRateEvent(hr));
+        }
+    }
+    return newFixedLengthResponse("");
   }
 
   private String toString(Map<String, ? extends Object> map) {

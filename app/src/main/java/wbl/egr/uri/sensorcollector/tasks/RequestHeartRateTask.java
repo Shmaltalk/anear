@@ -9,8 +9,12 @@ import com.microsoft.band.BandClientManager;
 import com.microsoft.band.BandInfo;
 import com.microsoft.band.sensors.HeartRateConsentListener;
 import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
+import wbl.egr.uri.sensorcollector.fitbit.FBClient;
+import wbl.egr.uri.sensorcollector.fitbit.FBClientManager;
+import wbl.egr.uri.sensorcollector.fitbit.FBInfo;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * Created by mconstant on 2/23/17.
@@ -42,16 +46,16 @@ public class RequestHeartRateTask extends AsyncTask<WeakReference<Activity>, Voi
 
         mContext = new WeakReference<Context>(activityWeakReference.get());
 
-        BandClientManager bandClientManager = BandClientManager.getInstance();
-        BandInfo[] pairedBands = bandClientManager.getPairedBands();
-        if (pairedBands.length == 0) {
+        FBClientManager bandClientManager = FBClientManager.getInstance();
+        List<FBInfo> pairedBands = bandClientManager.getConnectedBands();
+        if (pairedBands.size() == 0) {
             return null;
         } else {
             try {
                 if (activityWeakReference.get() != null) {
-                    BandClient bandClient = bandClientManager.create(activityWeakReference.get(), pairedBands[0]);
+                    FBClient bandClient = bandClientManager.create(activityWeakReference.get(), pairedBands.get(0));
                     bandClient.connect().await();
-                    bandClient.getSensorManager().requestHeartRateConsent(activityWeakReference.get(), mHeartRateConsentListener);
+                    //bandClient.getSensorManager().requestHeartRateConsent(activityWeakReference.get(), mHeartRateConsentListener);
                     bandClient.disconnect().await();
                 } else {
                     Log.d("CONSENT", "Caller Instance no longer exists");

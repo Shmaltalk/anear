@@ -84,9 +84,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        if (activityWeakReference != null && activityWeakReference.get() != null) {
+                        //if (activityWeakReference != null && activityWeakReference.get() != null) {
                             BandCollectionService.startStream(activityWeakReference.get());
-                        }
+                        //}
                         mConnecting = false;
                         mBeginStreamDialog.dismiss();
                     }
@@ -94,9 +94,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        if (activityWeakReference != null && activityWeakReference.get() != null) {
+                        //if (activityWeakReference != null && activityWeakReference.get() != null) {
                             BandCollectionService.disconnect(activityWeakReference.get());
-                        }
+                        //}
                         mConnecting = false;
                         mBeginStreamDialog.dismiss();
                     }
@@ -142,9 +142,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         switch (key) {
             case KEY_SENSOR_ENABLE:
                 if (sharedPreferences.getBoolean(key, false)) {
-                    if (!SettingsActivity.getBoolean(getActivity(), SettingsActivity.KEY_HR_CONSENT, false)) {
+                    /*if (!SettingsActivity.getBoolean(getActivity(), SettingsActivity.KEY_HR_CONSENT, false)) {
                         new RequestHeartRateTask().execute(new WeakReference<Activity>(getActivity()));
-                    }
+                    }*/
                     mConnecting = true;
                     BandCollectionService.connect(getActivity());
                 } else {

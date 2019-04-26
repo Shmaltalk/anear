@@ -10,7 +10,6 @@ import java.util.List;
 public class FBClientManager {
   private static FBClientManager instance = null;
   List<FBInfo> bandsConnected;
-  private CollectorServer server;
 
   public static FBClientManager getInstance() {
     if(instance == null) {
@@ -21,19 +20,17 @@ public class FBClientManager {
 
   private FBClientManager() {
     bandsConnected = new ArrayList<>();
-    server = new CollectorServer();
-    try {
-      server.start();
-    } catch (Exception e) {
-      System.out.println("Server failed to start: " + e);
-    }
   }
 
   public List<FBInfo> getConnectedBands() {
     return new ArrayList<>(bandsConnected);
   }
 
+  public void addBand() {
+    bandsConnected.add(new FBInfo("mac address", "band name"));
+  }
+
   public FBClient create(Service serv, FBInfo info) {
-    return new FBClient(serv, info, server);
+    return new FBClient(serv, info);
   }
 }

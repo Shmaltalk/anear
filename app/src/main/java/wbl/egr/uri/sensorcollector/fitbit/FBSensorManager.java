@@ -6,13 +6,11 @@ import wbl.egr.uri.sensorcollector.fitbit.listeners.FBAccelerometerEventListener
 import wbl.egr.uri.sensorcollector.fitbit.listeners.FBHeartRateEventListener;
 
 public class FBSensorManager {
-  private CollectorServer server;
   private FBHeartRateEventListener hrListener;
   private FBAccelerometerEventListener accListener;
   private boolean stopped;
 
-  public FBSensorManager(CollectorServer server) {
-    this.server = server;
+  public FBSensorManager() {
     stopped = false;
   }
 
@@ -30,5 +28,12 @@ public class FBSensorManager {
 
   public void start() {
     stopped = false;
+  }
+
+  public FBHeartRateEventListener getHeartRateEventListener() {
+    if (stopped) {
+      return null;
+    }
+    return hrListener;
   }
 }

@@ -18,6 +18,7 @@ import com.microsoft.band.sensors.GsrSampleRate;
 import com.microsoft.band.sensors.SampleRate;
 import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
 import wbl.egr.uri.sensorcollector.band_listeners.*;
+import wbl.egr.uri.sensorcollector.collector_server.CollectorServer;
 import wbl.egr.uri.sensorcollector.fitbit.FBClient;
 import wbl.egr.uri.sensorcollector.fitbit.FBClientManager;
 import wbl.egr.uri.sensorcollector.fitbit.FBInfo;
@@ -26,6 +27,7 @@ import wbl.egr.uri.sensorcollector.receivers.BandContactStateReceiver;
 import wbl.egr.uri.sensorcollector.receivers.BandUpdateReceiver;
 import wbl.egr.uri.sensorcollector.receivers.TestBandReceiver;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -127,6 +129,7 @@ public class BandCollectionService extends Service {
      */
     public static void startStream(Context context)
     {
+        Log.d("BCService", "Start stream");
         Intent intent = new Intent(context, BandCollectionService.class);
         intent.setAction(ACTION_START_STREAMING);
 //        PendingIntent pendIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -149,6 +152,7 @@ public class BandCollectionService extends Service {
      *
      */
     public static void requestBandInfo(Context context) {
+        Log.d("BCService", "Req info");
         Intent intent = new Intent(context, BandCollectionService.class);
         intent.setAction(ACTION_GET_INFO);
         context.startService(intent);
@@ -165,6 +169,7 @@ public class BandCollectionService extends Service {
      *
      */
     public static void disconnect(Context context) {
+        Log.d("BCService", "DC");
         Intent intent = new Intent(context, BandCollectionService.class);
         intent.setAction(ACTION_DISCONNECT);
         context.startService(intent);
@@ -188,6 +193,7 @@ public class BandCollectionService extends Service {
 
     private FBClientManager mBandClientManager;
     private FBClient mBandClient;
+    private CollectorServer mServer;
     private BandAccelerometerListener mBandAccelerometerListener;
     private BandAmbientLightListener mBandAmbientLightListener;
     private BandContactListener mBandContactListener;
@@ -399,6 +405,7 @@ public class BandCollectionService extends Service {
 
         //  Receives the sensor information of the sensors we will aggregate data from
         mBandClientManager = FBClientManager.getInstance();
+        mBandClientManager.addBand();
         mBandAccelerometerListener = new BandAccelerometerListener(this);
         mBandAmbientLightListener = new BandAmbientLightListener(this);
         mBandContactListener = new BandContactListener(this);
@@ -515,12 +522,17 @@ public class BandCollectionService extends Service {
         mBandName = bandInfo.getName();
         mBandAddress = bandInfo.getMacAddress();
         mBandClient = mBandClientManager.create(this, bandInfo);
-        mBandClient.connect();//.registerResultCallback(mBandConnectResultCallback);
+        mServer = new CollectorServer(mBandClient);
+        try {
+            mServer.start();
+        } catch (Exception e) {
+            Log.d("BandCollectionService", "Failed to start server: " + e);
+        }
     }
 
     //  Sends the information to the Settings for the user to see
     private void getInfo() {
-        if (mBandClient == null || !mBandClient.isConnected()) {
+        if (mBandClient == null) {
             return;
         }
 
@@ -543,7 +555,7 @@ public class BandCollectionService extends Service {
      */
     private void startStreaming() {
         log("Starting Stream");
-        if (mBandClient == null || !mBandClient.isConnected()) {
+        if (mBandClient == null) {
             log("Band is not Connected");
             return;
         }
@@ -568,6 +580,7 @@ public class BandCollectionService extends Service {
                 bandSensorManager.registerHeartRateEventListener(mBandHeartRateListener);
 //                bandSensorManager.registerRRIntervalEventListener(mBandRRIntervalListener);
 //                bandSensorManager.registerSkinTemperatureEventListener(mBandSkinTemperatureListener);
+                mServer.start();
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -611,6 +624,7 @@ public class BandCollectionService extends Service {
 //                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
                 mState = STATE_CONNECTED;
                 updateNotification("POWER-SAVING", android.R.drawable.presence_away);
+                mServer.stop();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -657,6 +671,7 @@ public class BandCollectionService extends Service {
 //                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
                 mState = STATE_CONNECTED;
                 updateNotification("POWER-SAVING", android.R.drawable.presence_away);
+                mServer.stop();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -675,7 +690,7 @@ public class BandCollectionService extends Service {
 
     private void enterDynamicBlackout()
     {
-        if (mBandClient.isConnected()) {
+        if (mServer.isAlive()) {
             updateNotification("Band is not being worn", android.R.drawable.presence_away);
         }
         FBSensorManager bandSensorManager = mBandClient.getSensorManager();
@@ -688,6 +703,7 @@ public class BandCollectionService extends Service {
 //            bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
 //            bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
             mState = STATE_NOT_WORN;
+            mServer.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -695,9 +711,9 @@ public class BandCollectionService extends Service {
 
     private void resumeFromDynamicBlackout()
     {
-        if (mBandClient.isConnected()) {
+        /*if (mServer.isAlive()) {
             updateNotification("STREAMING", android.R.drawable.presence_online);
-        }
+        }*/
         FBSensorManager bandSensorManager = mBandClient.getSensorManager();
         try {
             bandSensorManager.start();
@@ -708,6 +724,7 @@ public class BandCollectionService extends Service {
 //            bandSensorManager.registerRRIntervalEventListener(mBandRRIntervalListener);
 //            bandSensorManager.registerSkinTemperatureEventListener(mBandSkinTemperatureListener);
             mState = STATE_STREAMING;
+            mServer.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -720,7 +737,7 @@ public class BandCollectionService extends Service {
             return;
         }
 
-        if (mBandClient == null || !mBandClient.isConnected()) {
+        if (mBandClient == null) {
             log("Disconnect Failed (Band is not Connected)");
             SettingsActivity.putBoolean(this, SettingsActivity.KEY_SENSOR_ENABLE, false);
             stopSelf();
@@ -738,7 +755,7 @@ public class BandCollectionService extends Service {
             fullStopStreaming();
         }
 
-        mBandClient.disconnect();//.registerResultCallback(mBandDisconnectResultCallback, 10, TimeUnit.SECONDS);
+        //mBandClient.disconnect();//.registerResultCallback(mBandDisconnectResultCallback, 10, TimeUnit.SECONDS);
     }
 
     //  Updates the streaming status icon on the top of the phone
