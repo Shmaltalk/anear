@@ -534,7 +534,7 @@ public class BandCollectionService extends Service {
         mBandAddress = bandInfo.getMacAddress();
         mBandClient = mBandClientManager.create(bandInfo);
         mServer = new CollectorServer(mBandClient);
-        mServer.stop();
+        //mServer.stop();
         /*try {
             mServer.start();
         } catch (Exception e) {

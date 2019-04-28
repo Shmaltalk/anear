@@ -1,6 +1,7 @@
 package wbl.egr.uri.sensorcollector.band_listeners;
 
 import android.content.Context;
+import android.util.Log;
 import wbl.egr.uri.sensorcollector.activities.MainActivity;
 import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
 import wbl.egr.uri.sensorcollector.fitbit.events.FBHeartRateEvent;
@@ -48,6 +49,7 @@ public class BandHeartRateListener implements FBHeartRateEventListener {
         if (bandHeartRateEvent.getHeartRate() > Integer.parseInt(SettingsActivity.getString(mContext, KEY_HR_TRIGGER, "100")))// &&
                 //bandHeartRateEvent.getQuality().name().equals(HeartRateQuality.LOCKED.name()))
         {
+            Log.i("HEARTRATELISTENER", "PATIENT HR OVER 100! GJ");
             AudioRecordManager.start(mContext, AudioRecordManager.ACTION_AUDIO_TRIGGER);
         }
     }
