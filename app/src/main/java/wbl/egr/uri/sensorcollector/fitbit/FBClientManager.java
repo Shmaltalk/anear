@@ -30,7 +30,7 @@ public class FBClientManager {
     bandsConnected.add(new FBInfo("mac address", "band name"));
   }
 
-  public FBClient create(Service serv, FBInfo info) {
-    return new FBClient(serv, info);
+  public FBClient create(FBInfo info) {
+    return new FBClient(info);
   }
 }

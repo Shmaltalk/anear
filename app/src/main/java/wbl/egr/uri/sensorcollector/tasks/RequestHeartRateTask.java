@@ -53,10 +53,10 @@ public class RequestHeartRateTask extends AsyncTask<WeakReference<Activity>, Voi
         } else {
             try {
                 if (activityWeakReference.get() != null) {
-                    FBClient bandClient = bandClientManager.create(activityWeakReference.get(), pairedBands.get(0));
-                    bandClient.connect().await();
+                    FBClient bandClient = bandClientManager.create(pairedBands.get(0));
+                    //bandClient.connect().await();
                     //bandClient.getSensorManager().requestHeartRateConsent(activityWeakReference.get(), mHeartRateConsentListener);
-                    bandClient.disconnect().await();
+                    //bandClient.disconnect().await();
                 } else {
                     Log.d("CONSENT", "Caller Instance no longer exists");
                 }

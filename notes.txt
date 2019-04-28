@@ -1,0 +1,8 @@
+1. user clicks on button
+2. send intent to start datacollectionservice
+3. this starts the server
+4. on receiving req, server calls its eventlistener callback
+5. this saves the data and logs it
+
+1. user clicks on button
+

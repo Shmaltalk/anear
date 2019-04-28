@@ -7,13 +7,13 @@ import wbl.egr.uri.sensorcollector.collector_server.CollectorServer;
 
 public class FBClient {
   private FBInfo info;
-  private Service service;
+  //private Service service;
   private FBSensorManager sensManager;
   private FBNotificationManager notifManager;
 
-  public FBClient(Service serv, FBInfo myInfo) {
+  public FBClient(FBInfo myInfo) {
     info = myInfo;
-    service = serv;
+    //service = serv;
     sensManager = new FBSensorManager();
     notifManager = new FBNotificationManager();
   }

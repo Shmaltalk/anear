@@ -39,11 +39,11 @@ public class CollectorServer extends NanoHTTPD {
       super.start();
   }
 
-    @Override
-    public void stop() {
-        Log.d("collector", "Called .stop!");
-        super.stop();
-    }
+  @Override
+  public void stop() {
+      Log.d("collector", "Called .stop!");
+      super.stop();
+  }
 
   @Override
   public Response serve(IHTTPSession session) {
@@ -61,7 +61,7 @@ public class CollectorServer extends NanoHTTPD {
             hrlist.onBandHeartRateChanged(new FBHeartRateEvent(hr));
         }
     }
-    return newFixedLengthResponse("");
+    return newFixedLengthResponse("hello world");
   }
 
   private String toString(Map<String, ? extends Object> map) {

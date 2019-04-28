@@ -38,7 +38,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
      *  The Microsoft Band will send updates to the device indicating where it is in
      *  the connection process.
      */
-    private BandUpdateReceiver mBandUpdateReceiver = new BandUpdateReceiver() {
+    /*private BandUpdateReceiver mBandUpdateReceiver = new BandUpdateReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
@@ -60,7 +60,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 e.printStackTrace();
             }
         }
-    };
+    };*/
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -71,7 +71,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        getActivity().registerReceiver(mBandUpdateReceiver, BandUpdateReceiver.INTENT_FILTER);
+        //getActivity().registerReceiver(mBandUpdateReceiver, BandUpdateReceiver.INTENT_FILTER);
 
         mConnecting = false;
 
@@ -120,7 +120,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onDestroy() {
-        getActivity().unregisterReceiver(mBandUpdateReceiver);
+        //getActivity().unregisterReceiver(mBandUpdateReceiver);
         super.onDestroy();
     }
 
@@ -147,6 +147,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     }*/
                     mConnecting = true;
                     BandCollectionService.connect(getActivity());
+                    mBeginStreamDialog.show();
+                    mBeginStreamDialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
                 } else {
                     BandCollectionService.disconnect(getActivity());
                 }
