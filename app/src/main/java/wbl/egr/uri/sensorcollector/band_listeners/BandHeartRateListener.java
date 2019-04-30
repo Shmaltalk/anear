@@ -1,7 +1,13 @@
 package wbl.egr.uri.sensorcollector.band_listeners;
 
+import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
+
 import wbl.egr.uri.sensorcollector.activities.MainActivity;
 import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
 import wbl.egr.uri.sensorcollector.fitbit.events.FBHeartRateEvent;
@@ -30,9 +36,11 @@ public class BandHeartRateListener implements FBHeartRateEventListener {
     private static final String HEADER = "Patient ID, Date,Time,Heart Rate (BPM),Quality";
 
     private Context mContext;
-
+    private static final int NOTIFICATION_ID = 7903;
     public BandHeartRateListener(Context context) {
         mContext = context;
+        //Declare as Foreground Service
+        updateNotification("???");
     }
 
     @Override
@@ -45,12 +53,22 @@ public class BandHeartRateListener implements FBHeartRateEventListener {
                 bandHeartRateEvent.getHeartRate(); // + "," +
                 //bandHeartRateEvent.getQuality();
         DataLogService.log(mContext, new File(MainActivity.getRootFile(mContext), "/hr.csv"), data, HEADER);
-
+        updateNotification(Double.toString(bandHeartRateEvent.getHeartRate()));
         if (bandHeartRateEvent.getHeartRate() > Integer.parseInt(SettingsActivity.getString(mContext, KEY_HR_TRIGGER, "100")))// &&
                 //bandHeartRateEvent.getQuality().name().equals(HeartRateQuality.LOCKED.name()))
         {
             Log.i("HEARTRATELISTENER", "PATIENT HR OVER 100! GJ");
             AudioRecordManager.start(mContext, AudioRecordManager.ACTION_AUDIO_TRIGGER);
         }
+    }
+
+    private void updateNotification(String hr) {
+        Notification notification = new Notification.Builder(mContext)
+                .setContentTitle("ED EAR Heart Rate")
+                .setSmallIcon(android.R.drawable.presence_invisible)
+                .setContentText("Heart Rate: " + hr)
+                .build();
+        NotificationManager man = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        man.notify(NOTIFICATION_ID, notification);
     }
 }

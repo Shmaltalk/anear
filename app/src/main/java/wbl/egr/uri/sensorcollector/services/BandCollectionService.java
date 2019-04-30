@@ -495,7 +495,7 @@ public class BandCollectionService extends Service {
     @Override
     public void onDestroy() {
         mWakeLock.release();
-        mServer.stop();
+        //mServer.stop();
         unregisterReceiver(mBandContactStateReceiver);
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(500);
@@ -679,7 +679,7 @@ public class BandCollectionService extends Service {
 //                bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
 //                bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
 //                bandSensorManager.unregisterContactEventListener(mBandContactListener);
-//                bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
+//               .stop bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
 //                bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
 //                bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
 //                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
@@ -704,6 +704,7 @@ public class BandCollectionService extends Service {
 
     private void enterDynamicBlackout()
     {
+        Log.e("BCS", "WHY AM I IN DYNAMIC BO?");
         if (mServer.isAlive()) {
             updateNotification("Band is not being worn", android.R.drawable.presence_away);
         }
