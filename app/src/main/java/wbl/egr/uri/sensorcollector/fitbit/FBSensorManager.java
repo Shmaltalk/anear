@@ -31,9 +31,6 @@ public class FBSensorManager {
   }
 
   public FBHeartRateEventListener getHeartRateEventListener() {
-    if (stopped) {
-      return null;
-    }
     return hrListener;
   }
 }
