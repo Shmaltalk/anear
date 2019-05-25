@@ -27,7 +27,7 @@ public class FBClientManager {
   }
 
   public void addBand() {
-    bandsConnected.add(new FBInfo("mac address", "band name"));
+    bandsConnected.add(new FBInfo("Mac Addr NYI", "Name NYI"));
   }
 
   public FBClient create(FBInfo info) {

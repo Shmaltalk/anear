@@ -109,7 +109,7 @@ public class BandCollectionService extends Service {
         Intent intent = new Intent(context, BandCollectionService.class);
         intent.setAction(ACTION_CONNECT);
         intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
-        Log.d("CONNECTER", context.startService(intent).toString());
+        context.startService(intent);
         startStream(context);
     }
 
@@ -118,7 +118,7 @@ public class BandCollectionService extends Service {
         intent.setAction(ACTION_CONNECT);
         intent.putExtra(EXTRA_AUTO_STREAM, autoStream);
         intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
-        Log.d("CONNECTER", context.startService(intent).toString());
+        context.startService(intent);
     }
 
     /** startStream **
@@ -138,17 +138,8 @@ public class BandCollectionService extends Service {
         Intent intent = new Intent(context, BandCollectionService.class);
         intent.setAction(ACTION_START_STREAMING);
         intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
-//        PendingIntent pendIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-//        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 360000, pendIntent);
-        Log.d("CONNECTER", context.startService(intent).toString());
+        context.startService(intent);
     }
-
-//    public static void stopStream(Context context) {
-//        Intent intent = new Intent(context, BandCollectionService.class);
-//        intent.setAction(ACTION_STOP_STREAMING);
-//        context.startService(intent);
-//    }
 
     /** requestBandInfo
      *
@@ -219,165 +210,6 @@ public class BandCollectionService extends Service {
     private CountDownTimer  startTimer,
                             stopTimer;
 
-    /** mBandContactStateReceiver
-     *
-     * Receives information from the Microsoft Band regarding its contact state. This executes
-     * code whenever the band detects that its contact state (being worn / not being worn) has changed.
-     */
-    private BandContactStateReceiver mBandContactStateReceiver = new BandContactStateReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getBooleanExtra(BAND_STATE, false)) {
-                resumeFromDynamicBlackout();
-            } else {
-                enterDynamicBlackout();
-            }
-        }
-    };
-
-//    /** mBandConnectResultCallback
-//     *
-//     * This handles the actions that should take place depending on the connection
-//     * state of the MicrosoftBand. These various actions will update the phone's UI,
-//     * influence the sensor data aggregation, and influence the connectivity between
-//     * the phone and the MicrosoftBand.
-//     */
-//    private BandResultCallback<ConnectionState> mBandConnectResultCallback = new BandResultCallback<ConnectionState>() {
-//        @Override
-//        public void onResult(ConnectionState connectionState, Throwable throwable) {
-//            switch (connectionState) {
-//                case CONNECTED:
-//                    log("Connected");
-//                    mState = STATE_CONNECTED;
-//                    updateNotification("CONNECTED", android.R.drawable.presence_away);
-//                    try {
-//                        mBandClient.getNotificationManager().vibrate(); //VibrationType.RAMP_UP);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    //  AutoStream is called if the device reconnects after a disconnect
-//                    //  it quickly starts streaming if the device was streaming
-//                    //  before it disconnected
-//                    if (mAutoStream) {
-//                        startStreaming();
-//                    }
-//
-//                    //mBandClient.registerConnectionCallback(mBandConnectionCallback);
-//
-//                    mState = STATE_CONNECTED;
-//
-//                    //Broadcast Update
-//                    log("Broadcasting Update");
-//                    Intent intent = new Intent(BandUpdateReceiver.INTENT_FILTER.getAction(0));
-//                    intent.putExtra(BandUpdateReceiver.UPDATE_BAND_CONNECTED, true);
-//                    sendBroadcast(intent);
-//                    break;
-//                case BOUND:
-//                    log("Bound");
-//                    //  Completely disconnects the streaming
-//                    //  Ex. This is called when the sensor test fails
-//                    mState = STATE_DISCONNECTED;
-//                    updateNotification("DISCONNECTED", android.R.drawable.presence_offline);
-//                    Toast.makeText(mContext, "Could not connect to Band", Toast.LENGTH_LONG).show();
-////                    disconnect();
-//                    break;
-//                case BINDING:
-//                    log("Binding");
-//                    break;
-//                case UNBOUND:
-//                    log("Unbound");
-//                    //  Similar to BOUND, but does not completely disconnect the device
-//                    mState = STATE_DISCONNECTED;
-//                    updateNotification("UNBOUND", android.R.drawable.presence_busy);
-//                    Toast.makeText(mContext, "Could not connect to Band", Toast.LENGTH_LONG).show();
-//                    break;
-//                case UNBINDING:
-//                    log("Unbinding");
-//                    mState = STATE_OTHER;
-//                    break;
-//                default:
-//                    mState = STATE_OTHER;
-//                    log("Unknown State");
-//                    updateNotification("ERROR", android.R.drawable.presence_busy);
-//                    break;
-//            }
-//        }
-//    };
-//
-//    /** mBandConnetionCallback
-//     *
-//     * This is called by actions given by the MicrosoftBand itself.
-//     *
-//     * These actions are similar to the actions of the mBandConnectResultCallback.
-//     * However, these are called by the MicrosoftBand when it detects that its connection
-//     * state has changed.
-//     */
-//    private BandConnectionCallback mBandConnectionCallback = new BandConnectionCallback() {
-//        @Override
-//        public void onStateChanged(ConnectionState connectionState) {
-//            switch (connectionState) {
-//                case BINDING:
-//                    log("Binding");
-//                    break;
-//                case BOUND:
-//                    log("Bound");
-//                    mState = STATE_DISCONNECTED;
-//                    updateNotification("DISCONNECTED", android.R.drawable.presence_offline);
-//                    break;
-//                case CONNECTED:
-//                    log("Connected");
-//                    mState = STATE_CONNECTED;
-//                    updateNotification("CONNECTED", android.R.drawable.presence_away);
-//
-//                    if (mAutoStream || mState != STATE_PAUSED) {
-//                        startStreaming();
-//                    }
-//
-//                    //try {
-//                        mBandClient.getNotificationManager().vibrate(); //VibrationType.TWO_TONE_HIGH);
-//                    //} catch (BandIOException e) {
-//                    //    e.printStackTrace();
-//                    //}
-//
-//                    mState = STATE_CONNECTED;
-//
-//                    //Broadcast Update
-//                    log("Broadcasting Update");
-//                    Intent intent = new Intent(BandUpdateReceiver.INTENT_FILTER.getAction(0));
-//                    intent.putExtra(BandUpdateReceiver.UPDATE_BAND_CONNECTED, true);
-//                    sendBroadcast(intent);
-//                    break;
-//                case UNBINDING:
-//                    log("Unbinding");
-//                    break;
-//                case UNBOUND:
-//                    log("Unbound");
-//                    mState = STATE_DISCONNECTED;
-//                    updateNotification("DISCONNECTED", android.R.drawable.presence_offline);
-//                    break;
-//                case INVALID_SDK_VERSION:
-//                    log("Invalid SDK Version");
-//                    mState = STATE_OTHER;
-//                    break;
-//                case DISPOSED:
-//                    log("Disposed");
-//                    mState = STATE_OTHER;
-//                    break;
-//            }
-//        }
-//    };
-//
-//    private BandResultCallback<Void> mBandDisconnectResultCallback = new BandResultCallback<Void>() {
-//        @Override
-//        public void onResult(Void aVoid, Throwable throwable) {
-//            log("Disconnected");
-//            mState = STATE_DISCONNECTED;
-//            updateNotification("DISCONNECTED", android.R.drawable.presence_offline);
-//            stopSelf();
-//        }
-//    };
-
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -387,7 +219,6 @@ public class BandCollectionService extends Service {
     public void onCreate() {
         Log.d("SAVEME", "FROMTHENOTHINGBLAHBLAH");
         super.onCreate();
-        android.os.Debug.waitForDebugger();
         Log.d("SERVICE", "SERVICE CCREATE CERVICE CRTETEATE");
         log("Service Created");
         mContext = this;
@@ -421,8 +252,6 @@ public class BandCollectionService extends Service {
         mBandHeartRateListener = new BandHeartRateListener(this);
         mBandRRIntervalListener = new BandRRIntervalListener(this);
         mBandSkinTemperatureListener = new BandSkinTemperatureListener(this);
-
-        registerReceiver(mBandContactStateReceiver, BandContactStateReceiver.INTENT_FILTER);
     }
 
     /** onStartCommand
@@ -433,7 +262,6 @@ public class BandCollectionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
         if (flags == START_FLAG_REDELIVERY) {
-            Log.d("AGHAGHAGHAGHAGH", "IN SPOOKING CCASE BIG HELP");
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -447,7 +275,6 @@ public class BandCollectionService extends Service {
                 }
             }).start();
         } else {
-            Log.d("INTENTCATCH", "INTENT INTEINTN NI SINDNI SNIOOIDSS OSDOISDI DSI IUSDIUSDIU DSD  HDHISI DIHUSDIHSIDSI SDIOUDD");
             if (intent == null || intent.getAction() == null) {
                 return START_NOT_STICKY;
             }
@@ -468,7 +295,6 @@ public class BandCollectionService extends Service {
                     break;
                 case ACTION_START_STREAMING:
                     log("Stream Intent");
-                    Log.d("INTENTDE", "RECEIVE START INTENT");
                     startStreaming();
                     break;
                 case ACTION_STOP_STREAMING:
@@ -496,7 +322,6 @@ public class BandCollectionService extends Service {
     public void onDestroy() {
         mWakeLock.release();
         //mServer.stop();
-        unregisterReceiver(mBandContactStateReceiver);
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(500);
         log("Service Destroyed");
@@ -534,12 +359,6 @@ public class BandCollectionService extends Service {
         mBandAddress = bandInfo.getMacAddress();
         mBandClient = mBandClientManager.create(bandInfo);
         mServer = new CollectorServer(mBandClient);
-        //mServer.stop();
-        /*try {
-            mServer.start();
-        } catch (Exception e) {
-            Log.d("BandCollectionService", "Failed to start server: " + e);
-        }*/
     }
 
     //  Sends the information to the Settings for the user to see
@@ -566,11 +385,9 @@ public class BandCollectionService extends Service {
      * powerSaveMode method.
      */
     private void startStreaming() {
-        Log.d("BCS", "BCS START STEAM");
         log("Starting Stream");
         if (mBandClient == null) {
             log("Band is not Connected");
-            Log.d("ERRORERROR", "BAND NOCON");
             return;
         }
 
@@ -579,21 +396,14 @@ public class BandCollectionService extends Service {
             try {Thread.sleep(250);}
             catch (InterruptedException e) {e.printStackTrace();}
 
-            //log(mBandClient.getSensorManager().getCurrentHeartRateConsent().name());
             FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try
             {
-                //log(bandSensorManager.getCurrentHeartRateConsent().name());
                 mState = STATE_STREAMING;
                 updateNotification("STREAMING", android.R.drawable.presence_online);
-                // XXX Listeners NYI
-                bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener);//, SampleRate.MS128);
-//                bandSensorManager.registerAmbientLightEventListener(mBandAmbientLightListener);
-//                bandSensorManager.registerContactEventListener(mBandContactListener);
-//                bandSensorManager.registerGsrEventListener(mBandGsrListener, GsrSampleRate.MS200);
+                // XXX accel listener does nothing currently
+                bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener);
                 bandSensorManager.registerHeartRateEventListener(mBandHeartRateListener);
-//                bandSensorManager.registerRRIntervalEventListener(mBandRRIntervalListener);
-//                bandSensorManager.registerSkinTemperatureEventListener(mBandSkinTemperatureListener);
                 mServer.start();
             }
             catch (Exception e) {
@@ -629,13 +439,6 @@ public class BandCollectionService extends Service {
             FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try {
                 bandSensorManager.stop();
-                //bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
-//                bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
-//                bandSensorManager.unregisterContactEventListener(mBandContactListener);
-//                bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
-//                bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
-//                bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
-//                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
                 mState = STATE_CONNECTED;
                 updateNotification("POWER-SAVING", android.R.drawable.presence_away);
                 mServer.stop();
@@ -666,7 +469,7 @@ public class BandCollectionService extends Service {
             return;
         }
 
-        if (mState == STATE_STREAMING || mState == STATE_NOT_WORN) {
+        if (mState == STATE_STREAMING || mState == STATE_NOT_WORN || mState == STATE_CONNECTED) {
             try {
                 Thread.sleep(250);
             } catch (InterruptedException e) {
@@ -676,72 +479,12 @@ public class BandCollectionService extends Service {
             FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try {
                 bandSensorManager.stop();
-//                bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
-//                bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
-//                bandSensorManager.unregisterContactEventListener(mBandContactListener);
-//               .stop bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
-//                bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
-//                bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
-//                bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
-                mState = STATE_CONNECTED;
-                updateNotification("POWER-SAVING", android.R.drawable.presence_away);
+                mState = STATE_DISCONNECTED;
+                updateNotification("OFF", android.R.drawable.presence_offline);
                 mServer.stop();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    /**             NOTE: Dynamic Blackout does not refer to the blackout period!
-     *
-     * enterDynamicBlackout executes when the band is not being worn (hence the notification message).
-     * This temporarily unregisters the sensors while the band is not being worn so that it can
-     * save some of the band's battery.
-     *
-     * When the band is being worn again, resumeFromDynamicBlackout is called, turning the sensors
-     * on again and resuming the data collection.
-     */
-
-    private void enterDynamicBlackout()
-    {
-        Log.e("BCS", "WHY AM I IN DYNAMIC BO?");
-        if (mServer.isAlive()) {
-            updateNotification("Band is not being worn", android.R.drawable.presence_away);
-        }
-        FBSensorManager bandSensorManager = mBandClient.getSensorManager();
-        try {
-            bandSensorManager.stop();
-//            bandSensorManager.unregisterAccelerometerEventListener(mBandAccelerometerListener);
-//            bandSensorManager.unregisterAmbientLightEventListener(mBandAmbientLightListener);
-//            bandSensorManager.unregisterGsrEventListener(mBandGsrListener);
-//            bandSensorManager.unregisterHeartRateEventListener(mBandHeartRateListener);
-//            bandSensorManager.unregisterRRIntervalEventListener(mBandRRIntervalListener);
-//            bandSensorManager.unregisterSkinTemperatureEventListener(mBandSkinTemperatureListener);
-            mState = STATE_NOT_WORN;
-            mServer.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void resumeFromDynamicBlackout()
-    {
-        /*if (mServer.isAlive()) {
-            updateNotification("STREAMING", android.R.drawable.presence_online);
-        }*/
-        FBSensorManager bandSensorManager = mBandClient.getSensorManager();
-        try {
-            bandSensorManager.start();
-//            bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener, SampleRate.MS128);
-//            bandSensorManager.registerAmbientLightEventListener(mBandAmbientLightListener);
-//            bandSensorManager.registerGsrEventListener(mBandGsrListener, GsrSampleRate.MS200);
-//            bandSensorManager.registerHeartRateEventListener(mBandHeartRateListener);
-//            bandSensorManager.registerRRIntervalEventListener(mBandRRIntervalListener);
-//            bandSensorManager.registerSkinTemperatureEventListener(mBandSkinTemperatureListener);
-            mState = STATE_STREAMING;
-            mServer.start();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -769,8 +512,6 @@ public class BandCollectionService extends Service {
 
             fullStopStreaming();
         }
-
-        //mBandClient.disconnect();//.registerResultCallback(mBandDisconnectResultCallback, 10, TimeUnit.SECONDS);
     }
 
     //  Updates the streaming status icon on the top of the phone
