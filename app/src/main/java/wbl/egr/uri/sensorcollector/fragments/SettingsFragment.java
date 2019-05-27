@@ -29,38 +29,6 @@ import static wbl.egr.uri.sensorcollector.activities.SettingsActivity.*;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private SharedPreferences mSharedPreferences;
-    private MaterialDialog mBeginStreamDialog;
-    private boolean mConnecting;
-
-    /**
-     *  BandUpdateReceiver
-     *
-     *  The Microsoft Band will send updates to the device indicating where it is in
-     *  the connection process.
-     */
-    /*private BandUpdateReceiver mBandUpdateReceiver = new BandUpdateReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            try {
-                Log.d("RECEIVE", "update received");
-                //  The band will send an update indicating that it is connected to the device
-                if (intent.hasExtra(UPDATE_BAND_CONNECTED)) {
-                    if (mConnecting) {
-                        mBeginStreamDialog.show();
-                        mBeginStreamDialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
-                        BandCollectionService.requestBandInfo(getActivity());
-                    }
-                } else if (intent.hasExtra(UPDATE_BAND_INFO)) {
-                    if (mConnecting) {
-                        mBeginStreamDialog.setTitle("Connected to " + intent.getStringArrayExtra(EXTRA_BAND_INFO)[1]);
-                        mBeginStreamDialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };*/
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -71,37 +39,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        //getActivity().registerReceiver(mBandUpdateReceiver, BandUpdateReceiver.INTENT_FILTER);
-
-        mConnecting = false;
-
-        final WeakReference<Activity> activityWeakReference = new WeakReference<Activity>(getActivity());
-        mBeginStreamDialog = new MaterialDialog.Builder(getActivity())
-                .title("Connecting...")
-                .content("Would you like to begin collecting data?")
-                .positiveText("Yes")
-                .negativeText("No")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        //if (activityWeakReference != null && activityWeakReference.get() != null) {
-                            BandCollectionService.startStream(activityWeakReference.get());
-                        //}
-                        mConnecting = false;
-                        mBeginStreamDialog.dismiss();
-                    }
-                })
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        //if (activityWeakReference != null && activityWeakReference.get() != null) {
-                            BandCollectionService.disconnect(activityWeakReference.get());
-                        //}
-                        mConnecting = false;
-                        mBeginStreamDialog.dismiss();
-                    }
-                })
-                .build();
     }
 
     @Override
@@ -142,13 +79,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         switch (key) {
             case KEY_SENSOR_ENABLE:
                 if (sharedPreferences.getBoolean(key, false)) {
-                    /*if (!SettingsActivity.getBoolean(getActivity(), SettingsActivity.KEY_HR_CONSENT, false)) {
-                        new RequestHeartRateTask().execute(new WeakReference<Activity>(getActivity()));
-                    }*/
-                    mConnecting = true;
                     BandCollectionService.connect(getActivity());
-                    mBeginStreamDialog.show();
-                    mBeginStreamDialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
                 } else {
                     BandCollectionService.disconnect(getActivity());
                 }

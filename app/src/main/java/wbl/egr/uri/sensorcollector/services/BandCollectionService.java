@@ -105,10 +105,20 @@ public class BandCollectionService extends Service {
     public static final int STATE_OTHER = 5;
     private static final int REQUEST_CODE = 114;
 
+    private static CollectorServer server = null;
+    private static int state = STATE_OTHER;
+
+    private static CollectorServer getServer(FBClient cli) {
+        if (server == null) {
+            server = new CollectorServer(cli);
+        }
+        return server;
+    }
+
     public static void connect(Context context) {
         Intent intent = new Intent(context, BandCollectionService.class);
         intent.setAction(ACTION_CONNECT);
-        intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
+        //intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
         context.startService(intent);
         startStream(context);
     }
@@ -117,7 +127,7 @@ public class BandCollectionService extends Service {
         Intent intent = new Intent(context, BandCollectionService.class);
         intent.setAction(ACTION_CONNECT);
         intent.putExtra(EXTRA_AUTO_STREAM, autoStream);
-        intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
+        //intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
         context.startService(intent);
     }
 
@@ -137,7 +147,7 @@ public class BandCollectionService extends Service {
         Log.d("BCService", "Start stream");
         Intent intent = new Intent(context, BandCollectionService.class);
         intent.setAction(ACTION_START_STREAMING);
-        intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
+        //intent.setComponent(new ComponentName("wbl.egr.uri.sensorcollector", "wbl.egr.uri.sensorcollector.services.BandCollectionService"));
         context.startService(intent);
     }
 
@@ -205,8 +215,6 @@ public class BandCollectionService extends Service {
     private boolean mAutoStream;
     private PowerManager.WakeLock mWakeLock;
 
-    private int mState;
-
     private CountDownTimer  startTimer,
                             stopTimer;
 
@@ -222,7 +230,6 @@ public class BandCollectionService extends Service {
         Log.d("SERVICE", "SERVICE CCREATE CERVICE CRTETEATE");
         log("Service Created");
         mContext = this;
-        mState = STATE_OTHER;
         mBandName = null;
         mBandAddress = null;
         mAutoStream = false;
@@ -245,6 +252,8 @@ public class BandCollectionService extends Service {
         //  Receives the sensor information of the sensors we will aggregate data from
         mBandClientManager = FBClientManager.getInstance();
         mBandClientManager.addBand();
+        mBandClient = mBandClientManager.create(mBandClientManager.getConnectedBands().get(0));
+        mServer = getServer(mBandClient);
         mBandAccelerometerListener = new BandAccelerometerListener(this);
         mBandAmbientLightListener = new BandAmbientLightListener(this);
         mBandContactListener = new BandContactListener(this);
@@ -261,6 +270,9 @@ public class BandCollectionService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
+        /*if (this != getInstance()) {
+            return getInstance().onStartCommand(intent, flags, startID);
+        }*/
         if (flags == START_FLAG_REDELIVERY) {
             new Thread(new Runnable() {
                 @Override
@@ -305,9 +317,9 @@ public class BandCollectionService extends Service {
                     break;
                 case ACTION_TEST_SERVICE:
                     Intent testIntent = new Intent(TestBandReceiver.INTENT_FILTER.getAction(0));
-                    testIntent.putExtra(TestBandReceiver.EXTRA_STATE, mState);
+                    testIntent.putExtra(TestBandReceiver.EXTRA_STATE, state);
                     sendBroadcast(testIntent);
-                    if (mState == STATE_OTHER) {
+                    if (state == STATE_OTHER) {
                         stopSelf();
                     }
                 default:
@@ -332,7 +344,7 @@ public class BandCollectionService extends Service {
      *  that is necessary to connect to it.
      */
     private void connect() {
-        if (mBandClientManager == null) {
+        if (mBandClientManager == null || mBandClient == null) {
             log("Connect Failed (Band Client Manager not Initialized)");
             return;
         }
@@ -357,8 +369,6 @@ public class BandCollectionService extends Service {
         log("Attempting to Connect to " + bandInfo.getMacAddress() + "...");
         mBandName = bandInfo.getName();
         mBandAddress = bandInfo.getMacAddress();
-        mBandClient = mBandClientManager.create(bandInfo);
-        mServer = new CollectorServer(mBandClient);
     }
 
     //  Sends the information to the Settings for the user to see
@@ -381,8 +391,7 @@ public class BandCollectionService extends Service {
     /** startStreaming
      *
      * Starts streaming data from the Microsoft Band to the phone, and begins the periodic
-     * recording timer. The streaming continues for three minutes before calling the
-     * powerSaveMode method.
+     * recording timer.
      */
     private void startStreaming() {
         log("Starting Stream");
@@ -391,7 +400,7 @@ public class BandCollectionService extends Service {
             return;
         }
 
-        if (mState != STATE_STREAMING) {
+        if (state != STATE_STREAMING) {
 
             try {Thread.sleep(250);}
             catch (InterruptedException e) {e.printStackTrace();}
@@ -399,7 +408,7 @@ public class BandCollectionService extends Service {
             FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try
             {
-                mState = STATE_STREAMING;
+                state = STATE_STREAMING;
                 updateNotification("STREAMING", android.R.drawable.presence_online);
                 // XXX accel listener does nothing currently
                 bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener);
@@ -409,52 +418,6 @@ public class BandCollectionService extends Service {
             catch (Exception e) {
                 e.printStackTrace();
             }
-            startTimer = new CountDownTimer(180000,180000)
-            {
-                @Override
-                public void onTick(long millisUntilFinished) {}
-
-                @Override
-                public void onFinish() { powerSaveMode(); }
-            };
-            startTimer.start();
-            log("Start Timer Started");
-        }
-    }
-
-    /** powerSaveMode
-     *
-     * Stops recording most data. This unregisters every sensor besides the Ambient Light and Contact sensors for three minutes.
-     * After the three minutes has passed, startStreaming is called again to start recording data from every sensor.
-     */
-    private void powerSaveMode() {
-        if (mBandClient == null) {
-            return;
-        }
-
-        if (mState == STATE_STREAMING || mState == STATE_NOT_WORN) {
-            try {Thread.sleep(250);}
-            catch (InterruptedException e) {e.printStackTrace();}
-
-            FBSensorManager bandSensorManager = mBandClient.getSensorManager();
-            try {
-                bandSensorManager.stop();
-                mState = STATE_CONNECTED;
-                updateNotification("POWER-SAVING", android.R.drawable.presence_away);
-                mServer.stop();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            stopTimer = new CountDownTimer(180000,180000)
-            {
-                @Override
-                public void onTick(long millisUntilFinished) {}
-
-                @Override
-                public void onFinish() {startStreaming();}
-            };
-            stopTimer.start();
-            log("Stop Timer Started");
         }
     }
 
@@ -469,7 +432,7 @@ public class BandCollectionService extends Service {
             return;
         }
 
-        if (mState == STATE_STREAMING || mState == STATE_NOT_WORN || mState == STATE_CONNECTED) {
+        if (state == STATE_STREAMING || state == STATE_NOT_WORN || state == STATE_CONNECTED) {
             try {
                 Thread.sleep(250);
             } catch (InterruptedException e) {
@@ -479,7 +442,7 @@ public class BandCollectionService extends Service {
             FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try {
                 bandSensorManager.stop();
-                mState = STATE_DISCONNECTED;
+                state = STATE_DISCONNECTED;
                 updateNotification("OFF", android.R.drawable.presence_offline);
                 mServer.stop();
             } catch (Exception e) {
@@ -508,7 +471,7 @@ public class BandCollectionService extends Service {
             e.printStackTrace();
         }
 
-        if (mState == STATE_STREAMING) {
+        if (state == STATE_STREAMING || state == STATE_CONNECTED) {
 
             fullStopStreaming();
         }
