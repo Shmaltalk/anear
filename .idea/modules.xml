@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/anear.iml" filepath="$PROJECT_DIR$/anear.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../anear.iml" filepath="$PROJECT_DIR$/../anear.iml" />
       <module fileurl="file://$USER_HOME$/anear.iml" filepath="$USER_HOME$/anear.iml" />
       <module fileurl="file://$USER_HOME$/nanohttpd/anear-nanohttpd.iml" filepath="$USER_HOME$/nanohttpd/anear-nanohttpd.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../app/app.iml" filepath="$PROJECT_DIR$/../app/app.iml" />
       <module fileurl="file://$USER_HOME$/app/app.iml" filepath="$USER_HOME$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/nanohttpd/nanohttpd.iml" filepath="$PROJECT_DIR$/nanohttpd/nanohttpd.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../nanohttpd/nanohttpd.iml" filepath="$PROJECT_DIR$/../nanohttpd/nanohttpd.iml" />
       <module fileurl="file://$USER_HOME$/nanohttpd/nanohttpd.iml" filepath="$USER_HOME$/nanohttpd/nanohttpd.iml" />
     </modules>
   </component>

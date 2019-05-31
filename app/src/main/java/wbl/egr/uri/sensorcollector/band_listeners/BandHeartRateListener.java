@@ -33,14 +33,13 @@ import com.microsoft.band.sensors.HeartRateQuality;
  */
 
 public class BandHeartRateListener implements FBHeartRateEventListener {
-    private static final String HEADER = "Patient ID, Date,Time,Heart Rate (BPM),Quality";
+    private static final String HEADER = "Patient ID,Date,Time,Heart Rate (BPM)";
 
     private Context mContext;
     private static final int NOTIFICATION_ID = 7903;
     public BandHeartRateListener(Context context) {
         mContext = context;
-        //Declare as Foreground Service
-        updateNotification("???");
+        //updateNotification("???");
     }
 
     @Override
@@ -50,14 +49,11 @@ public class BandHeartRateListener implements FBHeartRateEventListener {
         String dateString = new SimpleDateFormat("MM/dd/yyyy", Locale.US).format(date);
         String timeString = new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(date);
         String data = p_id + "," + dateString + "," + timeString + "," +
-                bandHeartRateEvent.getHeartRate(); // + "," +
-                //bandHeartRateEvent.getQuality();
+                bandHeartRateEvent.getHeartRate();
         DataLogService.log(mContext, new File(MainActivity.getRootFile(mContext), "/hr.csv"), data, HEADER);
-        updateNotification(Double.toString(bandHeartRateEvent.getHeartRate()));
-        if (bandHeartRateEvent.getHeartRate() > Integer.parseInt(SettingsActivity.getString(mContext, KEY_HR_TRIGGER, "100")))// &&
-                //bandHeartRateEvent.getQuality().name().equals(HeartRateQuality.LOCKED.name()))
+        //updateNotification(Double.toString(bandHeartRateEvent.getHeartRate()));
+        if (bandHeartRateEvent.getHeartRate() > Integer.parseInt(SettingsActivity.getString(mContext, KEY_HR_TRIGGER, "100")))
         {
-            Log.i("HEARTRATELISTENER", "PATIENT HR OVER 100! GJ");
             AudioRecordManager.start(mContext, AudioRecordManager.ACTION_AUDIO_TRIGGER);
         }
     }
