@@ -1,5 +1,6 @@
 package wbl.egr.uri.sensorcollector.band_listeners;
 
+import android.util.Log;
 import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -48,8 +49,7 @@ public class BandHeartRateListener implements FBHeartRateEventListener {
         String p_id = SettingsActivity.getString(mContext, SettingsActivity.KEY_IDENTIFIER, null);
         String dateString = new SimpleDateFormat("MM/dd/yyyy", Locale.US).format(date);
         String timeString = new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(date);
-        String data = p_id + "," + dateString + "," + timeString + "," +
-                bandHeartRateEvent.getHeartRate();
+        String data = p_id + "," + dateString + "," + timeString + "," + bandHeartRateEvent.getHeartRate();
         DataLogService.log(mContext, new File(MainActivity.getRootFile(mContext), "/hr.csv"), data, HEADER);
         //updateNotification(Double.toString(bandHeartRateEvent.getHeartRate()));
         if (bandHeartRateEvent.getHeartRate() > Integer.parseInt(SettingsActivity.getString(mContext, KEY_HR_TRIGGER, "100")))
