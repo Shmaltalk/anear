@@ -9,8 +9,6 @@ public class FBHeartRateEvent {
     this.timestamp = timestamp;
   }
 
-  public double getHeartRate() {
-    return heartRate;
-  }
+  public double getHeartRate() { return heartRate; }
   public int getTimestamp() { return timestamp; }
 }
