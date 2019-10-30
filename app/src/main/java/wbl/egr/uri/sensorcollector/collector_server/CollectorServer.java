@@ -62,10 +62,12 @@ public class CollectorServer extends NanoHTTPD {
         return newFixedLengthResponse("bad");
       }
       double hr = json.get("heartrate").getAsDouble();
+      int timestamp = json.get("timestamp").getAsInt();
+
       Log.i("Server", "Got heart rate: " + hr);
       FBHeartRateEventListener hrlist = cli.getSensorManager().getHeartRateEventListener();
       if (hrlist != null) {
-        hrlist.onBandHeartRateChanged(new FBHeartRateEvent(hr));
+        hrlist.onBandHeartRateChanged(new FBHeartRateEvent(hr, timestamp));
       }
     }
     return newFixedLengthResponse("good");

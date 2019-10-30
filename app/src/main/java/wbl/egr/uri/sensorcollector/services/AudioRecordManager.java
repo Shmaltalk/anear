@@ -255,7 +255,7 @@ public class AudioRecordManager extends IntentService {
         // Adds the raw audio file to the directory
         File file = new File(directory, wavFileName);
         File temp = new File(directory, "raw_audio.tmp");
-        File audioRecordLog = new File(directory.getParentFile(), "AudioRecordLog.csv");
+        File audioRecordLog = new File(directory, "AudioRecordLog.csv");
 
         // Adds the WAV file to the directory
         Intent intent = new Intent(this, AudioRecorderService.class);

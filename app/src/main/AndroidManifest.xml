@@ -42,7 +42,7 @@
         <activity android:name=".activities.ConfirmPatternActivity"/>
         <activity android:name=".activities.SetPatternActivity"/>
 
-        <service android:name=".services.BandCollectionService"/> //android:process=":bandcollectionprocess"/>
+        <service android:name=".services.BandCollectionService"/>
         <service android:name=".services.DataLogService"/>
         <service android:name=".services.AudioRecorderService"/>
         <service android:name=".services.AudioRecordManager"/>
