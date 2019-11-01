@@ -11,8 +11,8 @@ import android.view.View;
 
 import wbl.egr.uri.sensorcollector.activities.MainActivity;
 import wbl.egr.uri.sensorcollector.activities.SettingsActivity;
-import wbl.egr.uri.sensorcollector.fitbit.events.FBHeartRateEvent;
-import wbl.egr.uri.sensorcollector.fitbit.listeners.FBHeartRateEventListener;
+import wbl.egr.uri.sensorcollector.fitbit.events.FBEvent;
+import wbl.egr.uri.sensorcollector.fitbit.listeners.FBEventListener;
 import wbl.egr.uri.sensorcollector.services.AudioRecordManager;
 import wbl.egr.uri.sensorcollector.services.DataLogService;
 
@@ -33,26 +33,28 @@ import com.microsoft.band.sensors.HeartRateQuality;
  * Created by mconstant on 2/22/17.
  */
 
-public class BandHeartRateListener implements FBHeartRateEventListener {
-    private static final String HEADER = "Patient ID,Date,Time,Heart Rate (BPM)";
+public class BandEventListener implements FBEventListener {
+    private static final String HEADER = "Patient ID,Date,Time,Heart Rate (BPM),Acceleration X,Acceleration Y,Acceleration Z,In Contact?";
 
     private Context mContext;
     private static final int NOTIFICATION_ID = 7903;
-    public BandHeartRateListener(Context context) {
+    public BandEventListener(Context context) {
         mContext = context;
         //updateNotification("???");
     }
 
     @Override
-    public void onBandHeartRateChanged(FBHeartRateEvent bandHeartRateEvent) {
+    public void onBandUpdate(FBEvent event) {
         Date date = Calendar.getInstance().getTime();
         String p_id = SettingsActivity.getString(mContext, SettingsActivity.KEY_IDENTIFIER, null);
         String dateString = new SimpleDateFormat("MM/dd/yyyy", Locale.US).format(date);
         String timeString = new SimpleDateFormat("HH:mm:ss.SSS", Locale.US).format(date);
-        String data = p_id + "," + dateString + "," + timeString + "," + bandHeartRateEvent.getHeartRate();
+        String data = p_id + "," + dateString + "," + timeString + "," + event.getHeartRate()
+                + "," + event.getAccX() + "," + event.getAccY() + "," + event.getAccZ() + ","
+                + event.getContact();
         DataLogService.log(mContext, new File(MainActivity.getRootFile(mContext), "/hr.csv"), data, HEADER);
         //updateNotification(Double.toString(bandHeartRateEvent.getHeartRate()));
-        if (bandHeartRateEvent.getHeartRate() > Integer.parseInt(SettingsActivity.getString(mContext, KEY_HR_TRIGGER, "100")))
+        if (event.getHeartRate() > Integer.parseInt(SettingsActivity.getString(mContext, KEY_HR_TRIGGER, "100")))
         {
             AudioRecordManager.start(mContext, AudioRecordManager.ACTION_AUDIO_TRIGGER);
         }

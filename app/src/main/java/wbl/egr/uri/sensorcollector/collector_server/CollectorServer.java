@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import fi.iki.elonen.NanoHTTPD;
 import wbl.egr.uri.sensorcollector.fitbit.FBClient;
-import wbl.egr.uri.sensorcollector.fitbit.events.FBHeartRateEvent;
-import wbl.egr.uri.sensorcollector.fitbit.listeners.FBHeartRateEventListener;
+import wbl.egr.uri.sensorcollector.fitbit.events.FBEvent;
+import wbl.egr.uri.sensorcollector.fitbit.listeners.FBEventListener;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -61,13 +61,11 @@ public class CollectorServer extends NanoHTTPD {
         Log.i("Server", "Caught request with no HR! :(");
         return newFixedLengthResponse("bad");
       }
-      double hr = json.get("heartrate").getAsDouble();
-      int timestamp = json.get("timestamp").getAsInt();
 
-      Log.i("Server", "Got heart rate: " + hr);
-      FBHeartRateEventListener hrlist = cli.getSensorManager().getHeartRateEventListener();
-      if (hrlist != null) {
-        hrlist.onBandHeartRateChanged(new FBHeartRateEvent(hr, timestamp));
+      Log.i("Server", "Got JSON");
+      FBEventListener list = cli.getSensorManager().getEventListener();
+      if (list != null) {
+        list.onBandUpdate(new FBEvent(json));
       }
     }
     return newFixedLengthResponse("good");
