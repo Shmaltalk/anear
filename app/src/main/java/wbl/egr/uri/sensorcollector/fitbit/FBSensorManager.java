@@ -1,25 +1,18 @@
 package wbl.egr.uri.sensorcollector.fitbit;
 
 import wbl.egr.uri.sensorcollector.collector_server.CollectorServer;
-import wbl.egr.uri.sensorcollector.fitbit.events.FBAccelerometerEvent;
-import wbl.egr.uri.sensorcollector.fitbit.listeners.FBAccelerometerEventListener;
-import wbl.egr.uri.sensorcollector.fitbit.listeners.FBHeartRateEventListener;
+import wbl.egr.uri.sensorcollector.fitbit.listeners.FBEventListener;
 
 public class FBSensorManager {
-  private FBHeartRateEventListener hrListener;
-  private FBAccelerometerEventListener accListener;
+  private FBEventListener listener;
   private boolean stopped;
 
   public FBSensorManager() {
     stopped = false;
   }
 
-  public void registerHeartRateEventListener(FBHeartRateEventListener ls) {
-    hrListener = ls;
-  }
-
-  public void registerAccelerometerEventListener(FBAccelerometerEventListener ls) {
-    accListener = ls;
+  public void registerEventListener(FBEventListener ls) {
+    listener = ls;
   }
 
   public void stop() {
@@ -30,7 +23,7 @@ public class FBSensorManager {
     stopped = false;
   }
 
-  public FBHeartRateEventListener getHeartRateEventListener() {
-    return hrListener;
+  public FBEventListener getEventListener() {
+    return listener;
   }
 }

@@ -205,7 +205,7 @@ public class BandCollectionService extends Service {
     private BandAmbientLightListener mBandAmbientLightListener;
     private BandContactListener mBandContactListener;
     private BandGsrListener mBandGsrListener;
-    private BandHeartRateListener mBandHeartRateListener;
+    private BandEventListener mBandEventListener;
     private BandRRIntervalListener mBandRRIntervalListener;
     private BandSkinTemperatureListener mBandSkinTemperatureListener;
 
@@ -258,7 +258,7 @@ public class BandCollectionService extends Service {
         mBandAmbientLightListener = new BandAmbientLightListener(this);
         mBandContactListener = new BandContactListener(this);
         mBandGsrListener = new BandGsrListener(this);
-        mBandHeartRateListener = new BandHeartRateListener(this);
+        mBandEventListener = new BandEventListener(this);
         mBandRRIntervalListener = new BandRRIntervalListener(this);
         mBandSkinTemperatureListener = new BandSkinTemperatureListener(this);
     }
@@ -411,8 +411,7 @@ public class BandCollectionService extends Service {
                 state = STATE_STREAMING;
                 updateNotification("STREAMING", android.R.drawable.presence_online);
                 // XXX accel listener does nothing currently
-                bandSensorManager.registerAccelerometerEventListener(mBandAccelerometerListener);
-                bandSensorManager.registerHeartRateEventListener(mBandHeartRateListener);
+                bandSensorManager.registerEventListener(mBandEventListener);
                 mServer.start();
             }
             catch (Exception e) {
