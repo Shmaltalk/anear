@@ -1,0 +1,29 @@
+{
+  "fitbit": {
+    "appUUID": "1e9b648d-bd0f-4a57-8e24-5803bdbb9363",
+    "appType": "app",
+    "appDisplayName": "heartrat-nov1",
+    "iconFile": "resources/icon.png",
+    "wipeColor": "#607d8b",
+    "requestedPermissions": [
+      "access_heart_rate",
+      "access_internet",
+      "run_background",
+      "access_activity",
+      "access_user_profile"
+    ],
+    "buildTargets": [
+      "mira",
+      "meson"
+    ],
+    "i18n": {
+      "en": {
+        "name": "heartrat-nov1"
+      }
+    },
+    "defaultLanguage": "en-US"
+  },
+  "devDependencies": {
+    "@fitbit/sdk": "~4.0.0"
+  }
+}
