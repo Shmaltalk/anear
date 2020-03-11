@@ -408,6 +408,7 @@ public class BandCollectionService extends Service {
             FBSensorManager bandSensorManager = mBandClient.getSensorManager();
             try
             {
+                log("Set state to streaming");
                 state = STATE_STREAMING;
                 updateNotification("STREAMING", android.R.drawable.presence_online);
                 // XXX accel listener does nothing currently
@@ -442,6 +443,7 @@ public class BandCollectionService extends Service {
             try {
                 bandSensorManager.stop();
                 state = STATE_DISCONNECTED;
+                log("Set state to disconnected");
                 updateNotification("OFF", android.R.drawable.presence_offline);
                 mServer.stop();
             } catch (Exception e) {

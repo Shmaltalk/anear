@@ -119,35 +119,21 @@ public class TestingFragment extends Fragment {
                         boolean sensorsEnabled = SettingsActivity.getBoolean(getActivity(), SettingsActivity.KEY_SENSOR_ENABLE, false);
                         int audioResult = checkAudio();
                         int sensorResult = checkSensors();
+                        boolean audioPassed = audioEnabled && (audioResult == 0);
+                        boolean sensorPassed = sensorsEnabled && (sensorResult == 0);
 
-                        if(audioEnabled && sensorsEnabled)
-                        {
-                            if (audioResult == 0 && sensorResult == 0)
+                        if (audioPassed) {
+                            if (sensorPassed) {
                                 passed();
-                            else if(audioResult != 0 && sensorResult != 0)
+                            } else {
+                                sensorsFailed(sensorResult);
+                            }
+                        } else {
+                            if (sensorPassed) {
+                                audioFailed(audioResult);
+                            } else {
                                 bothFailed();
-                            else if(audioResult != 0 && sensorResult == 0)
-                                audioFailed(audioResult);
-                            else
-                                sensorsFailed(sensorResult);
-                        }
-                        else if(audioEnabled && !sensorsEnabled)
-                        {
-                            if(audioResult == 0)
-                                passed();
-                            else
-                                audioFailed(audioResult);
-                        }
-                        else if(!audioEnabled && sensorsEnabled)
-                        {
-                            if(sensorResult == 0)
-                                passed();
-                            else
-                                sensorsFailed(sensorResult);
-                        }
-                        else
-                        {
-
+                            }
                         }
                     }
                 });
@@ -228,9 +214,6 @@ public class TestingFragment extends Fragment {
                     .onNegative(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            AudioRecordManager.start(getActivity(), AudioRecordManager.ACTION_AUDIO_CANCEL);
-                            AudioRecordManager.start(getActivity(), AudioRecordManager.ACTION_AUDIO_START);
-
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
